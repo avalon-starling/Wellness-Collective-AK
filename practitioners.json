@@ -1,21 +1,5 @@
 [
   {
-    "name": "Alice Ellis",
-    "email": "contact@stretchable907.com",
-    "town": "Wasilla",
-    "region": "Matanuska Valley",
-    "primaryModality": "Stretch Therapy",
-    "modalities": ["Yoga", "Stretch Therapy", "Holistic Health"],
-    "specialties": ["Recovery", "Pain Management", "Body Mechanics"],
-    "credentials": ["Certified Yoga Teacher", "Certified Stretch Therapist", "Holistic Health Practitioner"],
-    "yearsPracticing": 15,
-    "bio": "Owner of Stretch-Able 907 (Est. 2021). Certified Yoga Teacher and stretch therapist based in the Matanuska Valley. I offer Practitioner-Assisted Stretch Sessions, Tarot Crystal Readings, Pendulum Readings, and Tea/Tisane Consultations. Available as a traveling therapist or at my studio in Wasilla.",
-    "website": "https://www.stretchable907.com",
-    "format": "BOTH",
-    "rateLabel": "$120 per session",
-    "accepting": true
-  },
-  {
     "name": "Avalon Starling",
     "email": "avalon@thesoundspace.us",
     "town": "Anchorage",
@@ -82,19 +66,6 @@
     "website": "https://starseedtribe.etsy.com",
     "instagram": "@starseedtribe",
     "format": "BOTH",
-    "accepting": true
-  },
-  {
-    "name": "Sabrina Lababneh",
-    "email": "sabrina@massagetherapy.com",
-    "town": "Anchorage",
-    "region": "South-Central",
-    "primaryModality": "Massage Therapy",
-    "modalities": ["Massage Therapy"],
-    "credentials": ["Licensed Massage Therapist"],
-    "yearsPracticing": 8,
-    "bio": "Licensed Massage Therapist providing therapeutic massage services.",
-    "format": "IN_PERSON",
     "accepting": true
   },
   {
