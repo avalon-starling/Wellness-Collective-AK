@@ -4,6 +4,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { FlowerOfLife } from "@/components/FlowerOfLife";
 import { Eyebrow, ButtonLink } from "@/components/ui";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import { EventCard } from "@/components/EventCard";
 import { getUpcomingEvents } from "@/lib/data";
 
@@ -90,9 +91,14 @@ export default async function EventsPage({
           <div className="rounded-card border border-dashed border-rule bg-cream px-8 py-16 text-center">
             <h3 className="font-display text-3xl text-ink">Nothing on the calendar yet</h3>
             <p className="mx-auto mt-3 max-w-md font-serif text-lg text-inkSoft">
-              We're building out the events calendar as the Collective grows. Join the list to hear
-              about the first gatherings.
+              We're building out the events calendar as the Collective grows.
             </p>
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <span className="font-sans text-[11px] uppercase tracking-widest text-ink">Join the list for event announcements</span>
+              <div className="w-full max-w-xs">
+                <NewsletterForm source="events" />
+              </div>
+            </div>
           </div>
         )}
       </section>
