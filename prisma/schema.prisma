@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VerificationLevel {
+  LISTED // Level 1 — basic directory profile
+  VERIFIED // Level 2 — Collective has reviewed submitted professional info
+  MEMBER // Level 3 — verified + active paid Collective membership
+  FEATURED // Level 4 — member who meets criteria for enhanced visibility
+}
+
+enum MembershipTier {
+  NONE
+  PROVIDER // Collective Provider — $29/mo or $290/yr
+  PROFESSIONAL // Collective Professional — $59/mo or $590/yr
+  FOUNDING // Founding Collective Member — $199/yr, limited
+}
+
+enum BillingPeriod {
+  MONTHLY
+  ANNUAL
+}
+
+enum Format {
+  IN_PERSON
+  VIRTUAL
+  BOTH
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EventAccess {
+  OPEN // open to all
+  MEMBER // Collective members only
+  TICKETED // paid, members save
+}
+
+model Practitioner {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  published     Boolean  @default(false)
+
+  name          String
+  pronouns      String?
+  primaryModality String
+  modalities    String[] @default([])
+  specialties   String[] @default([])
+  town          String
+  region        String?
+  format        Format   @default(IN_PERSON)
+
+  bio           String   @db.Text
+  credentials   String[] @default([])
+  yearsPracticing Int?
+  languages     String[] @default([])
+
+  rateLabel     String?  // e.g. "$120 / session · sliding scale"
+  priceRange    String?  // "$", "$$", "$$$" — used for filtering
+
+  photoUrl      String?
+  website       String?
+  instagram     String?
+  bookingUrl    String?
+  contactEmail  String?
+  contactPhone  String?
+
+  verificationLevel VerificationLevel @default(LISTED)
+  membershipTier    MembershipTier    @default(NONE)
+  membershipPeriod  BillingPeriod?
+  membershipActive  Boolean           @default(false)
+  accepting         Boolean           @default(true)
+  featuredUntil     DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  applicationId String?  @unique
+  application   Application? @relation(fields: [applicationId], references: [id])
+}
+
+model Application {
+  id            String   @id @default(cuid())
+  status        ApplicationStatus @default(PENDING)
+
+  name          String
+  email         String
+  phone         String?
+  primaryModality String
+  modalities    String[] @default([])
+  town          String
+  format        Format   @default(IN_PERSON)
+
+  yearsPracticing Int?
+  credentials   String   @db.Text // free text — trainings/certifications/licenses
+  insurance     Boolean  @default(false)
+  businessInfo  String?  @db.Text
+  website       String?
+  instagram     String?
+
+  bio           String   @db.Text
+  message       String?  @db.Text
+  agreedToCodeOfConduct Boolean @default(false)
+
+  reviewedAt    DateTime?
+  reviewNotes   String?  @db.Text
+
+  createdAt     DateTime @default(now())
+
+  practitioner  Practitioner?
+}
+
+model Event {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  published     Boolean  @default(true)
+
+  title         String
+  description   String   @db.Text
+  modality      String?
+  host          String?
+
+  startsAt      DateTime
+  endsAt        DateTime?
+  location      String
+  locationType  Format   @default(IN_PERSON)
+  town          String?
+
+  access        EventAccess @default(OPEN)
+  price         String?
+  capacity      Int?
+
+  isFlagship    Boolean  @default(false) // Wellness Weekend
+  imageUrl      String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rsvps         EventRSVP[]
+}
+
+model EventRSVP {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  published   Boolean  @default(false)
+
+  title       String
+  category    String   // e.g. "Guide", "Article", "Education"
+  excerpt     String   @db.Text
+  content     String   @db.Text // markdown
+  coverImageUrl String?
+  author      String?
+
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String?  // e.g. "homepage", "wellness-weekend"
+  createdAt DateTime @default(now())
+}
