@@ -1,0 +1,14 @@
+# The Wellness Collective — wellnesscollectiveak.com
+# SEO robots configuration
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Allow: /api/subscribe
+
+# Sitemap
+Sitemap: https://wellnesscollectiveak.com/sitemap.xml
+
+# Crawl delay (optional - helps with server load)
+Crawl-delay: 1

@@ -3,6 +3,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { FlowerOfLife } from "@/components/FlowerOfLife";
 import { Eyebrow, ButtonLink, SectionEyebrowHeading } from "@/components/ui";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import { getDirectoryStats, getFlagshipEvent } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 
@@ -196,6 +197,22 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* NEWSLETTER SIGNUP */}
+      <section className="bg-cream px-6 py-20 md:px-14">
+        <div className="mx-auto max-w-2xl rounded-[28px] border-2 border-sage/30 bg-sage/5 p-10 md:p-14">
+          <Eyebrow tone="sage">Stay connected</Eyebrow>
+          <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
+            Get local events in your inbox.
+          </h2>
+          <p className="mt-4 max-w-lg font-serif text-lg leading-relaxed text-inkSoft">
+            Be first to hear about upcoming Collective events, practitioner mixers, Wellness Weekend, and community gatherings across Alaska.
+          </p>
+          <div className="mt-8">
+            <NewsletterForm source="homepage" />
+          </div>
+        </div>
+      </section>
 
       {/* PROVIDER CTA STRIP */}
       <section className="bg-paper px-6 pb-24 md:px-14">
