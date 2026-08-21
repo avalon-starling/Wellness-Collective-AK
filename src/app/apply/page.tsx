@@ -9,13 +9,32 @@ export const metadata: Metadata = {
   description: "Apply to be listed as a provider in The Wellness Collective directory — free, always.",
 };
 
+interface InviteData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  town?: string;
+  modality?: string;
+  preFilled?: boolean;
+}
+
 export default async function ApplyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ submitted?: string; error?: string; tier?: string; checkout?: string }>;
+  searchParams: Promise<{ submitted?: string; error?: string; tier?: string; checkout?: string; invite?: string; data?: string }>;
 }) {
   const sp = await searchParams;
   const submitted = sp.submitted === "1";
+
+  let inviteData: InviteData = {};
+  if (sp.data) {
+    try {
+      const decoded = Buffer.from(sp.data, "base64url").toString("utf-8");
+      inviteData = JSON.parse(decoded);
+    } catch (e) {
+      // Ignore invalid invite data
+    }
+  }
 
   return (
     <div>
@@ -67,15 +86,20 @@ export default async function ApplyPage({
               )}
 
               <form action="/api/apply" method="POST" className="grid gap-6">
-                <Field label="Full name" name="name" required />
+                {inviteData.preFilled && (
+                  <div className="rounded-xl border border-sage/40 bg-sage/10 px-4 py-3 font-serif text-sm text-ink">
+                    ✨ Welcome! Your info is pre-filled below. Just review and complete the rest.
+                  </div>
+                )}
+                <Field label="Full name" name="name" required defaultValue={inviteData.name} />
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <Field label="Email" name="email" type="email" required />
-                  <Field label="Phone" name="phone" type="tel" />
+                  <Field label="Email" name="email" type="email" required defaultValue={inviteData.email} />
+                  <Field label="Phone" name="phone" type="tel" defaultValue={inviteData.phone} />
                 </div>
 
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <Field label="Primary modality" name="primaryModality" placeholder="e.g. Doula, Reiki, Massage" required />
-                  <Field label="Town" name="town" placeholder="e.g. Anchorage" required />
+                  <Field label="Primary modality" name="primaryModality" placeholder="e.g. Doula, Reiki, Massage" required defaultValue={inviteData.modality} />
+                  <Field label="Town" name="town" placeholder="e.g. Anchorage" required defaultValue={inviteData.town} />
                 </div>
 
                 <Field
@@ -162,6 +186,7 @@ function Field({
   placeholder,
   min,
   max,
+  defaultValue,
 }: {
   label: string;
   name: string;
@@ -170,6 +195,7 @@ function Field({
   placeholder?: string;
   min?: number;
   max?: number;
+  defaultValue?: string;
 }) {
   return (
     <label className="block">
@@ -184,6 +210,7 @@ function Field({
         placeholder={placeholder}
         min={min}
         max={max}
+        defaultValue={defaultValue}
         className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 font-serif text-lg outline-none focus:border-plum"
       />
     </label>
