@@ -59,9 +59,10 @@ Set `ADMIN_EMAIL` to whatever email you want to sign in with, then visit
    set — every page that reads the database renders per-request rather
    than at build time — but the site won't show real data, and `/admin`
    won't be usable, until it's connected.)
-4. After the first deploy, create the tables in the production database
-   once: run `npx prisma db push` locally with `DATABASE_URL` pointed at
-   production (or `vercel env pull` first to grab it).
+4. Redeploy. `scripts/build.sh` runs `prisma db push` automatically on
+   every build whenever a real `DATABASE_URL` is set, so the tables get
+   created (and kept in sync with `schema.prisma`) with no manual step —
+   just make sure step 2 happened before this build runs.
 5. Point `wellnesscollectiveak.com`'s DNS at the Vercel project (Vercel's
    dashboard gives you the exact A/CNAME records once you add the domain).
 
