@@ -16,9 +16,21 @@ enum VerificationLevel {
 
 enum MembershipTier {
   NONE
+  FOUNDING // Founding member (free for 1 year) — 50 slots
   PROVIDER // Collective Provider — $29/mo or $290/yr
   PROFESSIONAL // Collective Professional — $59/mo or $590/yr
-  FOUNDING // Founding Collective Member — $199/yr, limited
+}
+
+enum SubmissionStatus {
+  PENDING // Awaiting admin review
+  APPROVED // Approved for publication
+  REJECTED // Rejected by admin
+}
+
+enum ForumRole {
+  MEMBER
+  MODERATOR
+  ADMIN
 }
 
 enum BillingPeriod {
@@ -77,14 +89,28 @@ model Practitioner {
   membershipTier    MembershipTier    @default(NONE)
   membershipPeriod  BillingPeriod?
   membershipActive  Boolean           @default(false)
+  membershipExpiresAt DateTime?       // For founding members: 1 year from creation
   accepting         Boolean           @default(true)
   featuredUntil     DateTime?
+
+  // Authentication
+  email         String   @unique
+  passwordHash  String?  // bcrypt hash
+  lastLoginAt   DateTime?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   applicationId String?  @unique
   application   Application? @relation(fields: [applicationId], references: [id])
+
+  // Relations
+  marketingSubmissions MarketingSubmission[]
+  blogPosts            BlogPost[]
+  forumPosts           ForumPost[]
+  profileViews         ProfileView[]
+
+  @@index([email])
 }
 
 model Application {
@@ -181,4 +207,100 @@ model Subscriber {
   email     String   @unique
   source    String?  // e.g. "homepage", "wellness-weekend"
   createdAt DateTime @default(now())
+}
+
+model MarketingSubmission {
+  id              String   @id @default(cuid())
+  practitionerId  String
+  practitioner    Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+
+  title           String
+  content         String   @db.Text
+  imageUrl        String?
+  status          SubmissionStatus @default(PENDING)
+  submittedFor    String   // "newsletter", "blog", "event"
+
+  reviewedAt      DateTime?
+  reviewNotes     String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([practitionerId])
+  @@index([status])
+}
+
+model BlogPost {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+
+  title           String
+  excerpt         String   @db.Text
+  content         String   @db.Text // markdown
+  coverImageUrl   String?
+
+  authorId        String
+  author          Practitioner @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  status          SubmissionStatus @default(PENDING) // PENDING, APPROVED, REJECTED
+  isMonthlySpotlight Boolean @default(false) // Monthly "new member" feature
+
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+model ProfileView {
+  id              String   @id @default(cuid())
+  practitionerId  String
+  practitioner    Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+
+  referrer        String?  // "search", "directory", "event", "blog", "external"
+  viewedAt        DateTime @default(now())
+
+  @@index([practitionerId])
+  @@index([viewedAt])
+}
+
+model ForumTopic {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+
+  title           String
+  description     String?  @db.Text
+  published       Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  posts           ForumPost[]
+}
+
+model ForumPost {
+  id              String   @id @default(cuid())
+  topicId         String
+  topic           ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  authorId        String?
+  author          Practitioner? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  title           String?  // Only for top-level posts
+  content         String   @db.Text
+
+  parentPostId    String?
+  parentPost      ForumPost? @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
+  replies         ForumPost[] @relation("PostReplies")
+
+  published       Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([authorId])
+  @@index([parentPostId])
 }
