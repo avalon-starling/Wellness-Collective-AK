@@ -117,3 +117,17 @@ export async function getDirectoryStats() {
     townCount: towns.length,
   };
 }
+
+export async function recordProfileView(practitionerId: string, referrer?: string) {
+  try {
+    await db.profileView.create({
+      data: {
+        practitionerId,
+        referrer: referrer || "directory",
+      },
+    });
+  } catch (error) {
+    // Silently fail — view tracking is not critical
+    console.error("Failed to record profile view:", error);
+  }
+}

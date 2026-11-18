@@ -11,6 +11,21 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async redirects() {
+    return [
+      // Redirect old /find-wellness URLs to /directory
+      {
+        source: "/find-wellness",
+        destination: "/directory",
+        permanent: true, // 301 redirect
+      },
+      {
+        source: "/find-wellness/:slug",
+        destination: "/directory/:slug",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
